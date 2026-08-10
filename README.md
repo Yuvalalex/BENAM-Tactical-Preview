@@ -15,7 +15,7 @@
 
 BENAM is a local-first field operations web app for handling mission setup, casualty tracking, evacuation flow, reporting, and offline data transfer without a cloud dependency.
 
-[View the BENAM presentation deck]([(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing])]
+[View the BENAM presentation deck]([(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing])])
 
 (https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing)
 

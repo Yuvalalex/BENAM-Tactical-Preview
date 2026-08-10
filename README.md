@@ -17,6 +17,8 @@ BENAM is a local-first field operations web app for handling mission setup, casu
 
 [View the BENAM presentation deck]([(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing])]
 
+(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing)
+
 </div>
 
 ---

@@ -88,9 +88,46 @@ export class ActionDelegator {
     if (handler) {
       handler(event, actionEl);
     } else {
-      console.warn(
-        `[ActionDelegator] No handler for action: "${actionName}"`,
-      );
+      this.invokeLegacyGlobalAction(actionName, event, actionEl);
+    }
+  }
+
+  private parseActionArgs(actionEl: HTMLElement): unknown[] {
+    const raw = actionEl.dataset.actionArgs;
+    if (!raw) return [];
+
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return [raw];
+    }
+  }
+
+  private invokeLegacyGlobalAction(actionName: string, event: MouseEvent, actionEl: HTMLElement): void {
+    const globalObj = window as unknown as Record<string, unknown>;
+    const fn = globalObj[actionName];
+
+    if (typeof fn !== 'function') {
+      console.warn(`[ActionDelegator] No handler for action: "${actionName}"`);
+      return;
+    }
+
+    if (actionEl.dataset.stopPropagation === 'true') {
+      event.stopPropagation();
+    }
+
+    const args = this.parseActionArgs(actionEl);
+    try {
+      (fn as (...params: unknown[]) => unknown)(...args);
+      if (actionEl.closest('#tb-menu')) {
+        const closeMenu = globalObj.closeTopbarMenu;
+        if (typeof closeMenu === 'function') {
+          (closeMenu as () => void)();
+        }
+      }
+    } catch (err) {
+      console.error(`[ActionDelegator] Action "${actionName}" failed:`, err);
     }
   }
 }

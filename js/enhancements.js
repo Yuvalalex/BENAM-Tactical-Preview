@@ -1282,14 +1282,52 @@ setTimeout(updatePrepScreen,300);
 let _pinBuffer='';
 let _pinAttempts=parseInt(localStorage.getItem('benam_pin_attempts')||'0');
 let _lastActivity=Date.now();
+const PIN_SALT_KEY='benam_pin_salt';
+const PIN_VERSION='pin3';
 
-// Improved hash — PBKDF2-like multiple rounds (still offline, no deps)
-function hashPin(pin){
+function hashPinLegacy(pin){
   let h=5381;
   for(let round=0;round<100;round++){
     for(let i=0;i<pin.length;i++){h=((h<<5)+h+round)^pin.charCodeAt(i);h|=0;}
   }
   return 'pin2_'+Math.abs(h).toString(36);
+}
+
+function ensurePinSalt(){
+  let salt=localStorage.getItem(PIN_SALT_KEY);
+  if(salt) return salt;
+  const bytes=new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  salt=Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+  localStorage.setItem(PIN_SALT_KEY,salt);
+  return salt;
+}
+
+async function hashPin(pin){
+  const value=String(pin||'');
+  if(crypto?.subtle){
+    const salt=ensurePinSalt();
+    const data=new TextEncoder().encode(`${salt}:${value}`);
+    const digest=await crypto.subtle.digest('SHA-256',data);
+    const hash=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    return `${PIN_VERSION}$${salt}$${hash}`;
+  }
+  return hashPinLegacy(value);
+}
+
+async function verifyStoredPin(stored,pin){
+  if(!stored) return { ok:false };
+  if(stored.startsWith(`${PIN_VERSION}$`)){
+    if(!crypto?.subtle) return { ok:false, reason:'crypto_unavailable' };
+    const parts=stored.split('$');
+    if(parts.length!==3) return { ok:false };
+    const [,salt,expected]=parts;
+    const data=new TextEncoder().encode(`${salt}:${String(pin||'')}`);
+    const digest=await crypto.subtle.digest('SHA-256',data);
+    const actual=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    return { ok:actual===expected };
+  }
+  return { ok:stored===hashPinLegacy(String(pin||'')) };
 }
 
 function pinInput(n){
@@ -1315,7 +1353,7 @@ function pinClear(){
   const dots=document.querySelectorAll('.pin-dot');
   dots.forEach((d,i)=>{d.classList.toggle('filled',i<_pinBuffer.length);});
 }
-function pinCheck(){
+async function pinCheck(){
   // Check time-based lockout
   const lockUntil=parseInt(localStorage.getItem('benam_pin_lockout')||'0');
   if(Date.now()<lockUntil){
@@ -1329,16 +1367,29 @@ function pinCheck(){
   const stored=localStorage.getItem('benam_pin');
   if(!stored){
     // No PIN set — first time, save this one
-    localStorage.setItem('benam_pin',hashPin(_pinBuffer));
+    localStorage.setItem('benam_pin',await hashPin(_pinBuffer));
     pinUnlock();
     showToast('🔒 PIN נשמר');
-  } else if(hashPin(_pinBuffer)===stored){
+  } else {
+    const verification=await verifyStoredPin(stored,_pinBuffer);
+    if(verification.reason==='crypto_unavailable'){
+      const err=document.getElementById('pin-error');
+      if(err) err.textContent='PIN דורש הקשר מאובטח (HTTPS)';
+      _pinBuffer='';
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('filled'));
+      return;
+    }
+    if(verification.ok){
+    const upgraded=await hashPin(_pinBuffer);
+    if(upgraded && upgraded!==stored){
+      localStorage.setItem('benam_pin',upgraded);
+    }
     // Correct PIN — reset attempts
     _pinAttempts=0;
     localStorage.setItem('benam_pin_attempts','0');
     localStorage.removeItem('benam_pin_lockout');
     pinUnlock();
-  } else {
+    } else {
     _pinAttempts++;
     localStorage.setItem('benam_pin_attempts',String(_pinAttempts));
     const err=document.getElementById('pin-error');
@@ -1351,6 +1402,7 @@ function pinCheck(){
       // Lock for 60 seconds (persistent across reload)
       localStorage.setItem('benam_pin_lockout',String(Date.now()+60000));
       if(err) err.textContent='נעילה — נסה שוב עוד 60 שניות';
+    }
     }
   }
 }

@@ -1,37 +1,14 @@
 import { getElement, escapeHtml } from '../utils/DomHelper.js';
 import { getState, getForceRoster, saveState } from '../services/StateService.js';
 import { createCasualtyRecord, getForceMemberPrefill } from '../services/CasualtyCreationService.js';
-
-function readLegacyGlobal(name) {
-  if (window[name] !== undefined) {
-    return window[name];
-  }
-  try {
-    return window.eval(`typeof ${name} === 'undefined' ? undefined : ${name}`);
-  } catch (_) {
-    return undefined;
-  }
-}
-
-function runLegacy(code) {
-  try {
-    return window.eval(code);
-  } catch (e) {
-    console.warn('[BENAM] Legacy eval failed:', e);
-    return undefined;
-  }
-}
+import { readLegacyGlobal, writeLegacyGlobal } from '../utils/LegacyGlobalHelper.js';
 
 function getMechanismSelection() {
   return readLegacyGlobal('mechSel') || [];
 }
 
 function setMechanismSelection(nextSelection) {
-  if (window.mechSel !== undefined) {
-    window.mechSel = nextSelection;
-  } else {
-    runLegacy(`mechSel = ${JSON.stringify(nextSelection)}`);
-  }
+  writeLegacyGlobal('mechSel', nextSelection);
 }
 
 function getBloodTypes() {

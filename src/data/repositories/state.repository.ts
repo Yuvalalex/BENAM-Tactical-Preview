@@ -11,6 +11,11 @@ import type { AppState, Casualty, ForceMember, TimelineEvent, CommsData, SupplyI
 import { type Result, Ok, Err, AppError, ErrorCode, ErrorSeverity } from '../../core/errors';
 
 const STATE_KEY = 'state';
+const LEGACY_STATE_KEYS = ['benam_s', 'benam_s_training'] as const;
+const LEGACY_STATE_KEY_BY_MODE = {
+  training: LEGACY_STATE_KEYS[1],
+  operational: LEGACY_STATE_KEYS[0],
+} as const;
 
 /**
  * Partial state shape for legacy compatibility.
@@ -43,7 +48,19 @@ export class StateRepository {
    * Save the full application state.
    */
   save(state: AppState): Result<void> {
-    return this.storage.set(STATE_KEY, state);
+    const result = this.storage.set(STATE_KEY, state);
+    if (!result.ok) return result;
+
+    try {
+      const legacyKey = state.opMode === 'training'
+        ? LEGACY_STATE_KEY_BY_MODE.training
+        : LEGACY_STATE_KEY_BY_MODE.operational;
+      localStorage.setItem(legacyKey, JSON.stringify(state));
+    } catch (err) {
+      console.warn('[StateRepository] Legacy mirror write failed', err);
+    }
+
+    return Ok(undefined);
   }
 
   /**
@@ -53,11 +70,15 @@ export class StateRepository {
   load(): Result<LegacyStateShape | null> {
     const result = this.storage.get<LegacyStateShape>(STATE_KEY);
     if (!result.ok) return result;
+    let value = result.value;
 
-    if (result.value === null) return Ok(null);
+    if (value === null) {
+      value = this.loadLegacySnapshot();
+      if (value === null) return Ok(null);
+    }
 
     // Basic structural validation
-    if (typeof result.value !== 'object') {
+    if (typeof value !== 'object') {
       return Err(
         new AppError(ErrorCode.STORAGE_CORRUPT, 'Saved state is not an object', {
           severity: ErrorSeverity.HIGH,
@@ -65,7 +86,7 @@ export class StateRepository {
       );
     }
 
-    return Ok(result.value);
+    return Ok(value);
   }
 
   /**
@@ -104,5 +125,18 @@ export class StateRepository {
    */
   loadBackup(): Result<LegacyStateShape | null> {
     return this.storage.get<LegacyStateShape>('state_backup');
+  }
+
+  private loadLegacySnapshot(): LegacyStateShape | null {
+    for (const key of LEGACY_STATE_KEYS) {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      try {
+        return JSON.parse(raw) as LegacyStateShape;
+      } catch {
+        continue;
+      }
+    }
+    return null;
   }
 }

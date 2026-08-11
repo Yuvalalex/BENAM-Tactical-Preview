@@ -1,16 +1,10 @@
 import { BLOOD_COMPATIBILITY_MATRIX, ALL_BLOOD_TYPES } from '../constants/BloodCompatibilityMatrix.js';
 import { MEDICAL_CONSTANTS } from '../constants/MedicalConstants.js';
 import { escapeHtml, getElement, padTwoDigits } from '../utils/DomHelper.js';
+import { readLegacyGlobal as readLegacyGlobalValue } from '../utils/LegacyGlobalHelper.js';
 
 function readLegacyGlobal(name) {
-  if (window[name] !== undefined) {
-    return window[name];
-  }
-  try {
-    return window.eval(`typeof ${name} === 'undefined' ? undefined : ${name}`);
-  } catch (_) {
-    return undefined;
-  }
+  return readLegacyGlobalValue(name);
 }
 
 function ensureLegacyNamespace() {

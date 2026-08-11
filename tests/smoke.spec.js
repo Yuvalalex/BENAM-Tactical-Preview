@@ -11,28 +11,28 @@ test.beforeEach(async ({ page }) => {
 
 async function setupApp(page) {
   await page.goto('/', { waitUntil: 'load' });
-  await page.waitForTimeout(500);
+  await page.waitForSelector('#sc-role');
   await page.evaluate(() => {
     const tut = document.getElementById('tutorial-overlay');
     if (tut) tut.style.display = 'none';
   });
   // Skip role selection to go directly to prep
   await page.evaluate(() => { skipRoleSetup(); });
-  await page.waitForTimeout(300);
+  await expect(page.locator('#sc-prep')).toBeVisible();
 }
 
 async function startMission(page) {
   await setupApp(page);
   page.on('dialog', dialog => dialog.accept());
   await page.evaluate(() => { _doStartMission(); });
-  await page.waitForTimeout(500);
+  await expect(page.locator('#sc-war')).toBeVisible();
 }
 
 test('app loads without JS errors', async ({ page }) => {
   const errors = [];
   page.on('pageerror', err => errors.push(err.message));
   await page.goto('/', { waitUntil: 'load' });
-  await page.waitForTimeout(1000);
+  await page.waitForSelector('#app');
   expect(errors).toEqual([]);
 });
 
@@ -58,7 +58,7 @@ test('quickAddCas adds casualty without errors', async ({ page }) => {
   await startMission(page);
 
   await page.evaluate(() => { quickAddCas(); });
-  await page.waitForTimeout(500);
+  await expect.poll(async () => page.evaluate(() => S.casualties.length)).toBeGreaterThan(0);
 
   const count = await page.evaluate(() => S.casualties.length);
   expect(count).toBeGreaterThan(0);
@@ -71,16 +71,16 @@ test('fire mode buttons work', async ({ page }) => {
   await startMission(page);
 
   await page.evaluate(() => { quickAddCas(); });
-  await page.waitForTimeout(300);
+  await expect.poll(async () => page.evaluate(() => S.casualties.length)).toBeGreaterThan(0);
 
   await page.evaluate(() => { toggleFireMode(); });
-  await page.waitForTimeout(300);
+  await expect.poll(async () => page.evaluate(() => !!S.fireMode)).toBeTruthy();
 
   await page.evaluate(() => { fireTQ(); });
-  await page.waitForTimeout(300);
+  await expect.poll(async () => page.evaluate(() => S.casualties[0]?.txList?.length || 0)).toBeGreaterThan(0);
 
   await page.evaluate(() => { fireTXA(); });
-  await page.waitForTimeout(300);
+  await expect.poll(async () => page.evaluate(() => S.casualties[0]?.txList?.length || 0)).toBeGreaterThan(0);
 
   expect(errors).toEqual([]);
 });
@@ -91,11 +91,10 @@ test('view modes render without errors', async ({ page }) => {
   await startMission(page);
 
   await page.evaluate(() => { quickAddCas(); });
-  await page.waitForTimeout(300);
+  await expect.poll(async () => page.evaluate(() => S.casualties.length)).toBeGreaterThan(0);
 
   for (const mode of ['matrix', 'triage', 'march', 'blood', 'cards']) {
     await page.evaluate(m => setWarView(m), mode);
-    await page.waitForTimeout(200);
   }
 
   expect(errors).toEqual([]);

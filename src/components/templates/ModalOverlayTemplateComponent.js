@@ -4,6 +4,8 @@
  * Injected into <div id="modal-overlay-template-root"> at runtime.
  */
 
+import { setStaticHtml } from '../../utils/DomHelper.js';
+
 const MODAL_OVERLAY_TEMPLATE_HTML = `
   <!-- START TRIAGE OVERLAY -->
   <div id="start-overlay"
@@ -526,7 +528,7 @@ export function mountModalOverlayTemplateRoot() {
     console.warn('[BENAM] modal-overlay-template-root not found — skipping modal overlay mount');
     return;
   }
-  root.innerHTML = MODAL_OVERLAY_TEMPLATE_HTML;
+  setStaticHtml(root, MODAL_OVERLAY_TEMPLATE_HTML);
 }
 
 export function initModalOverlayTemplateComponent() {

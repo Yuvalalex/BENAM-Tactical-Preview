@@ -15,9 +15,7 @@
 
 BENAM is a local-first field operations web app for handling mission setup, casualty tracking, evacuation flow, reporting, and offline data transfer without a cloud dependency.
 
-[View the BENAM presentation deck]([(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing])])
-
-(https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing)
+[View the BENAM presentation deck](https://docs.google.com/presentation/d/1dOmADFgqdxe--yQ07pob6icAYKNHVX6_DnLUm9n2ZiU/edit?usp=sharing)
 
 </div>
 
@@ -78,17 +76,30 @@ This flow is reflected directly in the application screens and test coverage.
 ## Architecture Snapshot
 
 Hybrid codebase:
-- Legacy runtime in [js](js)
-- Newer modular code in [src](src)
-- Browser shell in [index.html](index.html)
-- Android packaging in [android](android)
-- E2E coverage in [tests](tests)
+- Legacy runtime in [js](js) — monolithic `app.js` (9 500 LOC) + 41 source parts
+- Newer modular TypeScript in [src](src) — Clean Architecture layers: `core`, `domain`, `data`, `features`, `presentation`, `background`
+- Browser shell in [index.html](index.html) — PWA shell with CSP enforcement
+- Android packaging in [android](android) — Capacitor + Gradle
+- E2E coverage in [tests](tests) — Playwright specs
+- Engineering docs in [docs](docs) — PRD and Architecture deep-dive
 
 Key repository signals:
 - Large real-world UI runtime in [js/app.js](js/app.js)
 - Incremental TypeScript architecture in [src](src)
 - CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml)
 - Playwright regression coverage via [playwright.config.js](playwright.config.js)
+
+## Migration Roadmap (Legacy → TypeScript)
+
+- **Current source of truth**: `window.S` (legacy runtime), with TypeScript services reading through a bridge.
+- **Already migrated to modular TS**: core DI/events/errors, domain services (`src/domain`), facades (`src/features`), background services (`src/background`), state/storage abstractions (`src/data`), and presentation infrastructure (`src/presentation`).
+- **Still legacy-heavy**: large UI/event surface in `index.html` inline handlers and `js/app.js` operational flows.
+- **In progress hardening**:
+  - removed `eval` usage in `src` bridge/services;
+  - introduced centralized delegated actions (`data-action`) for critical entry points;
+  - aligned typed state repository with legacy storage keys for compatibility fallback;
+  - tightened CSP by removing `unsafe-eval` while keeping legacy-compatible `unsafe-inline`.
+- **Next migration target**: progressively replace remaining inline handlers and lift more mission flow logic from `js/app.js` into typed services/facades.
 
 ## Quick Start
 
@@ -163,11 +174,15 @@ BENAM is presented here as a technical project and workflow tool.
 This repository is not presented as a regulated clinical decision system, a certified medical product, or a substitute for formal medical command, training, or protocol authority.
 
 
-## Additional Project Docs
+## Engineering Documentation
 
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
-- [CHANGELOG.md](CHANGELOG.md)
+| Document | Description |
+|---|---|
+| [docs/PRD.md](docs/PRD.md) | Master Product Requirements Document — vision, feature spec, KPIs, security, and open decisions |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Deep-Dive Technical Architecture — data flow, DI, EventBus, state management, Mermaid diagrams |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+| [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) | Release checklist |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
 
 ## License
 

@@ -14,3 +14,26 @@ export function escapeHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+let trustedTypesPolicy = null;
+
+function getTrustedPolicy() {
+  if (trustedTypesPolicy || typeof window === 'undefined' || !window.trustedTypes) {
+    return trustedTypesPolicy;
+  }
+
+  trustedTypesPolicy = window.trustedTypes.createPolicy('benam-static-html', {
+    createHTML: (value) => value,
+  });
+  return trustedTypesPolicy;
+}
+
+export function setStaticHtml(element, html) {
+  if (!element) return;
+  const policy = getTrustedPolicy();
+  if (policy) {
+    element.innerHTML = policy.createHTML(String(html));
+    return;
+  }
+  element.innerHTML = String(html);
+}

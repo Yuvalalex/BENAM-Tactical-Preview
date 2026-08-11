@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'self' blob:;">
+    content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; media-src 'self' blob:;">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -57,21 +57,21 @@
       <div class="pin-dot"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;max-width:240px;width:100%">
-      <button class="pin-key" onclick="pinInput(1)">1</button>
-      <button class="pin-key" onclick="pinInput(2)">2</button>
-      <button class="pin-key" onclick="pinInput(3)">3</button>
-      <button class="pin-key" onclick="pinInput(4)">4</button>
-      <button class="pin-key" onclick="pinInput(5)">5</button>
-      <button class="pin-key" onclick="pinInput(6)">6</button>
-      <button class="pin-key" onclick="pinInput(7)">7</button>
-      <button class="pin-key" onclick="pinInput(8)">8</button>
-      <button class="pin-key" onclick="pinInput(9)">9</button>
-      <button class="pin-key" onclick="pinClear()" style="font-size:14px">⌫</button>
-      <button class="pin-key" onclick="pinInput(0)">0</button>
-      <button class="pin-key" onclick="pinSkip()" style="font-size:10px;color:var(--muted)">דלג</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[1]">1</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[2]">2</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[3]">3</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[4]">4</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[5]">5</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[6]">6</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[7]">7</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[8]">8</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[9]">9</button>
+      <button class="pin-key" data-action="pinClear" style="font-size:14px">⌫</button>
+      <button class="pin-key" data-action="pinInput" data-action-args="[0]">0</button>
+      <button class="pin-key" data-action="pinSkip" style="font-size:10px;color:var(--muted)">דלג</button>
     </div>
     <div id="pin-error" style="font-size:10px;color:var(--red3);min-height:16px"></div>
-    <button onclick="pinSetup()"
+    <button data-action="pinSetup"
       style="background:none;border:none;color:var(--olive3);font-size:10px;margin-top:8px;cursor:pointer;font-family:var(--font)">⚙
       הגדר PIN חדש</button>
   </div>
@@ -84,10 +84,10 @@
       <div id="incident-bar"></div>
       <div id="topbar-normal">
         <div style="flex-shrink:0;display:flex;align-items:center;gap:6px">
-          <button class="tb-icon-btn" onclick="event.stopPropagation();toggleTopbarMenu()" title="More">⋯</button>
+          <button class="tb-icon-btn" data-action="toggleTopbarMenu" data-stop-propagation="true" title="More">⋯</button>
         </div>
         <div class="tb-clock" id="clock">00:00:00</div>
-        <div id="evac-badge" class="evac-badge" style="display:none" onclick="openEvacQueue()">
+        <div id="evac-badge" class="evac-badge" style="display:none" data-action="openEvacQueue">
           <span id="evac-badge-text"></span>
           <span id="evac-badge-timer" style="font-size:8px;font-family:var(--font-mono);margin-right:4px"></span>
         </div>
@@ -95,28 +95,28 @@
           style="display:none;font-size:9px;padding:2px 5px;background:rgba(200,20,20,.25);border:1px solid var(--red2);border-radius:4px;color:var(--red3);font-weight:700;animation:pulse 2s ease-in-out infinite;white-space:nowrap">
           ● REC</div>
         <!-- Readiness / smart checklist badge -->
-        <div id="tb-readiness-badge" onclick="openSmartChecklist()" class="btn btn-sm btn-ghost"
+        <div id="tb-readiness-badge" data-action="openSmartChecklist" class="btn btn-sm btn-ghost"
           style="display:none;font-size:11px;padding:0 8px;min-height:28px;border-color:var(--olive3);color:var(--olive3);border-radius:4px;white-space:nowrap;font-weight:700">
           📋 <span id="tb-readiness-val"></span>
         </div>
         <!-- Topbar dropdown menu -->
         <div id="tb-menu"
           style="display:none;position:absolute;top:52px;right:8px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:6px;z-index:100;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,.6)">
-          <div class="tb-menu-item" onclick="closeTopbarMenu();openSyncDashboard()" style="background:var(--s3); border-bottom:1px solid var(--b0); font-weight:900; color:var(--white)">📡 מרכז סנכרון (Sync)</div>
-          <div class="tb-menu-item" onclick="closeTopbarMenu();openOperationsList()">📁 מבצעים</div>
-          <div class="tb-menu-item" onclick="closeTopbarMenu();openTacticalMap()">🗺️ מפה</div>
-          <div class="tb-menu-item tb-war-only" onclick="closeTopbarMenu();openStatusReport()" style="display:none">📊
+          <div class="tb-menu-item" data-action="openSyncDashboard" style="background:var(--s3); border-bottom:1px solid var(--b0); font-weight:900; color:var(--white)">📡 מרכז סנכרון (Sync)</div>
+          <div class="tb-menu-item" data-action="openOperationsList">📁 מבצעים</div>
+          <div class="tb-menu-item" data-action="openTacticalMap">🗺️ מפה</div>
+          <div class="tb-menu-item tb-war-only" data-action="openStatusReport" style="display:none">📊
             דוח מצב</div>
           <!-- דו"ח menu item removed -->
           <!-- night vision menu item removed -->
-          <div class="tb-menu-item" onclick="closeTopbarMenu();openMedicAllocView()">👨‍⚕️ Medics</div>
-          <div class="tb-menu-item" onclick="closeTopbarMenu();toggleRecording()">🔴 הקלטה</div>
+          <div class="tb-menu-item" data-action="openMedicAllocView">👨‍⚕️ Medics</div>
+          <div class="tb-menu-item" data-action="toggleRecording">🔴 הקלטה</div>
           <!-- מסך מלא removed -->
-          <div class="tb-menu-item" onclick="closeTopbarMenu();openUserSettings()">⚙️ הגדרות</div>
+          <div class="tb-menu-item" data-action="openUserSettings">⚙️ הגדרות</div>
         </div>
-        <button class="btn btn-sm btn-ghost" id="medics-topbar-btn" onclick="openMedicAllocView()"
+        <button class="btn btn-sm btn-ghost" id="medics-topbar-btn" data-action="openMedicAllocView"
           style="display:flex;padding:0 8px;min-height:28px;border-color:var(--olive2);color:var(--olive3);margin-right:6px">👨‍⚕️</button>
-        <button class="btn btn-sm btn-ghost" id="fire-toggle-btn" onclick="toggleFireMode()"
+        <button class="btn btn-sm btn-ghost" id="fire-toggle-btn" data-action="toggleFireMode"
           style="display:none;padding:0 8px;min-height:28px;border-color:var(--red2);color:var(--red3)">🔥</button>
       </div>
       <div id="topbar-fire">

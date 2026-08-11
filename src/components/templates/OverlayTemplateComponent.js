@@ -1,3 +1,5 @@
+import { setStaticHtml } from '../../utils/DomHelper.js';
+
 const OVERLAY_TEMPLATE_HTML = `
   <!-- ═══ NEW OVERLAYS ═══ -->
   <div id="evac-pkg-overlay"
@@ -185,7 +187,7 @@ export function mountOverlayTemplateRoot() {
     return;
   }
 
-  root.innerHTML = OVERLAY_TEMPLATE_HTML;
+  setStaticHtml(root, OVERLAY_TEMPLATE_HTML);
   root.dataset.mounted = 'true';
 }
 

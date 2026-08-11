@@ -75,11 +75,7 @@ declare global {
 const BRIDGE_VERSION = '0.1.0';
 
 function readLegacyLexicalState(): LegacyState | undefined {
-  try {
-    return window.eval('typeof S === "undefined" ? undefined : S') as LegacyState | undefined;
-  } catch {
-    return undefined;
-  }
+  return window.S;
 }
 
 /**
@@ -97,6 +93,13 @@ export function initBridge(): void {
     initialized: true,
     services: {},
   };
+
+  if (!window.BENAM_LEGACY) {
+    window.BENAM_LEGACY = {};
+  }
+  if (typeof window.BENAM_LEGACY.getState !== 'function') {
+    window.BENAM_LEGACY.getState = () => window.S;
+  }
 
   console.log(`[BENAM Bridge] v${BRIDGE_VERSION} initialized`);
 }

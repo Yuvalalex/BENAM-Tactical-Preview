@@ -17,6 +17,22 @@ const ASSETS = [
   './icons/png/icon-512.png'
 ];
 
+async function networkFetchWithCacheFallback(request, cacheFallback) {
+  try {
+    const response = await fetch(request, { cache: 'no-cache' });
+    if (response && response.ok) {
+      const clone = response.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+      return response;
+    }
+    if (cacheFallback) return cacheFallback;
+    return response;
+  } catch {
+    if (cacheFallback) return cacheFallback;
+    throw new Error('Network unavailable and no cache fallback');
+  }
+}
+
 // Install — precache all critical assets
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -66,15 +82,10 @@ self.addEventListener('fetch', event => {
   // Navigation requests — network-first with cache fallback
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
+      caches.match(request).then(cachedNav =>
+        networkFetchWithCacheFallback(request, cachedNav || undefined)
+          .catch(() => caches.match('./index.html'))
+      )
     );
     return;
   }

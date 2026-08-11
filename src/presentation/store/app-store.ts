@@ -59,6 +59,7 @@ export class AppStore {
     if (json !== this.lastSnapshotJson) {
       this.lastSnapshotJson = json;
       this.notifyAll();
+      this.eventBus.emit('state:restored', { timestamp: Date.now() as Timestamp });
     }
   }
 
@@ -99,7 +100,11 @@ export class AppStore {
 
   private invokeLegacySave(): void {
     if (typeof window.saveState === 'function') {
-      window.saveState();
+      try {
+        window.saveState();
+      } catch (err) {
+        console.error('[AppStore] Failed to persist legacy state:', err);
+      }
     }
   }
 
@@ -110,11 +115,21 @@ export class AppStore {
   private currentJson(): string {
     if (!window.S) return '';
     const s = window.S;
-    // Compare only key mutable fields for performance
+    const casualties = Array.isArray(s.casualties) ? s.casualties as Array<Record<string, unknown>> : [];
+    const timeline = Array.isArray(s.timeline) ? s.timeline as Array<Record<string, unknown>> : [];
+    const lastTimeline = timeline.length > 0 ? timeline[timeline.length - 1] : null;
+    // Compare high-value mutable fields while keeping payload bounded.
     return JSON.stringify([
-      s.casualties?.length,
+      casualties.length,
+      casualties.map((c) => [c.id, c.priority, Array.isArray(c.txList) ? c.txList.length : 0, c._addedAt]),
       s.missionActive,
-      s.timeline?.length,
+      timeline.length,
+      lastTimeline?.ms ?? null,
+      lastTimeline?.text ?? null,
+      s.supplies,
+      s.comms,
+      s.role,
+      s.opMode,
     ]);
   }
 

@@ -1,12 +1,7 @@
+import { readLegacyGlobal as readLegacyGlobalValue } from '../utils/LegacyGlobalHelper.js';
+
 function readLegacyGlobal(name) {
-  if (window[name] !== undefined) {
-    return window[name];
-  }
-  try {
-    return window.eval(`typeof ${name} === 'undefined' ? undefined : ${name}`);
-  } catch (_) {
-    return undefined;
-  }
+  return readLegacyGlobalValue(name);
 }
 
 export function getState() {

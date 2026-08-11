@@ -90,6 +90,18 @@ Key repository signals:
 - CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml)
 - Playwright regression coverage via [playwright.config.js](playwright.config.js)
 
+## Migration Roadmap (Legacy → TypeScript)
+
+- **Current source of truth**: `window.S` (legacy runtime), with TypeScript services reading through a bridge.
+- **Already migrated to modular TS**: core DI/events/errors, domain services (`src/domain`), facades (`src/features`), background services (`src/background`), state/storage abstractions (`src/data`), and presentation infrastructure (`src/presentation`).
+- **Still legacy-heavy**: large UI/event surface in `index.html` inline handlers and `js/app.js` operational flows.
+- **In progress hardening**:
+  - removed `eval` usage in `src` bridge/services;
+  - introduced centralized delegated actions (`data-action`) for critical entry points;
+  - aligned typed state repository with legacy storage keys for compatibility fallback;
+  - tightened CSP by removing `unsafe-eval` while keeping legacy-compatible `unsafe-inline`.
+- **Next migration target**: progressively replace remaining inline handlers and lift more mission flow logic from `js/app.js` into typed services/facades.
+
 ## Quick Start
 
 ### Prerequisites

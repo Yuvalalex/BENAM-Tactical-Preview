@@ -134,11 +134,7 @@ function hasLegacyStateSource(): boolean {
     return true;
   }
 
-  try {
-    return typeof window.eval('typeof S === "undefined" ? undefined : S') === 'object';
-  } catch {
-    return false;
-  }
+  return typeof window.S === 'object' && window.S !== null;
 }
 
 function reportLegacyBridgeStatus(): void {

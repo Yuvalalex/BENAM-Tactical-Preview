@@ -83,8 +83,8 @@ self.addEventListener('fetch', event => {
   if (request.mode === 'navigate') {
     event.respondWith(
       caches.match(request).then(cachedNav =>
-        networkFetchWithCacheFallback(request, cachedNav || undefined)
-          .catch(() => caches.match('./index.html'))
+        networkFetchWithCacheFallback(request)
+          .catch(() => cachedNav || caches.match('./index.html'))
       )
     );
     return;

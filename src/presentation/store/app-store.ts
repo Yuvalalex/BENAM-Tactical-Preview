@@ -116,12 +116,13 @@ export class AppStore {
     if (!window.S) return '';
     const s = window.S;
     const casualties = Array.isArray(s.casualties) ? s.casualties as Array<Record<string, unknown>> : [];
+    const recentCasualties = casualties.slice(-30);
     const timeline = Array.isArray(s.timeline) ? s.timeline as Array<Record<string, unknown>> : [];
     const lastTimeline = timeline.length > 0 ? timeline[timeline.length - 1] : null;
     // Compare high-value mutable fields while keeping payload bounded.
     return JSON.stringify([
       casualties.length,
-      casualties.map((c) => [c.id, c.priority, Array.isArray(c.txList) ? c.txList.length : 0, c._addedAt]),
+      recentCasualties.map((c) => [c.id, c.priority, Array.isArray(c.txList) ? c.txList.length : 0, c._addedAt]),
       s.missionActive,
       timeline.length,
       lastTimeline?.ms ?? null,

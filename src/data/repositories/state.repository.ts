@@ -12,6 +12,10 @@ import { type Result, Ok, Err, AppError, ErrorCode, ErrorSeverity } from '../../
 
 const STATE_KEY = 'state';
 const LEGACY_STATE_KEYS = ['benam_s', 'benam_s_training'] as const;
+const LEGACY_STATE_KEY_BY_MODE = {
+  training: LEGACY_STATE_KEYS[1],
+  operational: LEGACY_STATE_KEYS[0],
+} as const;
 
 /**
  * Partial state shape for legacy compatibility.
@@ -48,15 +52,12 @@ export class StateRepository {
     if (!result.ok) return result;
 
     try {
-      const legacyKey = state.opMode === 'training' ? 'benam_s_training' : 'benam_s';
+      const legacyKey = state.opMode === 'training'
+        ? LEGACY_STATE_KEY_BY_MODE.training
+        : LEGACY_STATE_KEY_BY_MODE.operational;
       localStorage.setItem(legacyKey, JSON.stringify(state));
     } catch (err) {
-      return Err(
-        new AppError(ErrorCode.STORAGE_WRITE, 'Failed to write legacy state snapshot', {
-          severity: ErrorSeverity.MEDIUM,
-          cause: err instanceof Error ? err : undefined,
-        }),
-      );
+      console.warn('[StateRepository] Legacy mirror write failed', err);
     }
 
     return Ok(undefined);

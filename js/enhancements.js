@@ -1316,17 +1316,18 @@ async function hashPin(pin){
 }
 
 async function verifyStoredPin(stored,pin){
-  if(!stored) return false;
+  if(!stored) return { ok:false };
   if(stored.startsWith(`${PIN_VERSION}$`)){
+    if(!crypto?.subtle) return { ok:false, reason:'crypto_unavailable' };
     const parts=stored.split('$');
-    if(parts.length!==3) return false;
+    if(parts.length!==3) return { ok:false };
     const [,salt,expected]=parts;
     const data=new TextEncoder().encode(`${salt}:${String(pin||'')}`);
     const digest=await crypto.subtle.digest('SHA-256',data);
     const actual=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    return actual===expected;
+    return { ok:actual===expected };
   }
-  return stored===String(pin||'') || stored===hashPinLegacy(String(pin||''));
+  return { ok:stored===hashPinLegacy(String(pin||'')) };
 }
 
 function pinInput(n){
@@ -1369,7 +1370,16 @@ async function pinCheck(){
     localStorage.setItem('benam_pin',await hashPin(_pinBuffer));
     pinUnlock();
     showToast('🔒 PIN נשמר');
-  } else if(await verifyStoredPin(stored,_pinBuffer)){
+  } else {
+    const verification=await verifyStoredPin(stored,_pinBuffer);
+    if(verification.reason==='crypto_unavailable'){
+      const err=document.getElementById('pin-error');
+      if(err) err.textContent='PIN דורש הקשר מאובטח (HTTPS)';
+      _pinBuffer='';
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('filled'));
+      return;
+    }
+    if(verification.ok){
     const upgraded=await hashPin(_pinBuffer);
     if(upgraded && upgraded!==stored){
       localStorage.setItem('benam_pin',upgraded);
@@ -1379,7 +1389,7 @@ async function pinCheck(){
     localStorage.setItem('benam_pin_attempts','0');
     localStorage.removeItem('benam_pin_lockout');
     pinUnlock();
-  } else {
+    } else {
     _pinAttempts++;
     localStorage.setItem('benam_pin_attempts',String(_pinAttempts));
     const err=document.getElementById('pin-error');
@@ -1392,6 +1402,7 @@ async function pinCheck(){
       // Lock for 60 seconds (persistent across reload)
       localStorage.setItem('benam_pin_lockout',String(Date.now()+60000));
       if(err) err.textContent='נעילה — נסה שוב עוד 60 שניות';
+    }
     }
   }
 }

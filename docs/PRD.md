@@ -116,9 +116,9 @@ When devices need to exchange state in a COMMS-DN environment:
 
 - PIN is never stored in plaintext.
 - At PIN creation: a cryptographically random salt is generated (`crypto.getRandomValues`).
-- PIN + salt are combined and hashed with bcrypt-lite (work factor ≥ 10 rounds).
-- Hash and salt stored in `localStorage` under `benam_pin_hash` / `benam_pin_salt`.
-- Session unlock: input PIN + stored salt → hash → compare with stored hash.
+- PIN + salt are concatenated and hashed using `crypto.subtle.digest('SHA-256')` (WebCrypto API, available natively in all modern browsers and Android WebView).
+- Hash and salt stored in `localStorage` under `benam_pin` / `benam_pin_salt`.
+- Session unlock: input PIN + stored salt → SHA-256 hash → compare with stored hash.
 - Auto-lock: configurable idle timeout (default 5 minutes in training mode, disabled in operational mode).
 
 ### 3.6 AI Situational Awareness Advisor

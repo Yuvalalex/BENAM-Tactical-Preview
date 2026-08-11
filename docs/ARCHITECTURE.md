@@ -495,7 +495,7 @@ User enters PIN
     │
     ▼
 PinSecurityService.hashPin(pin, salt)
-    │ bcrypt-lite, work factor 12
+    │ SHA-256 via crypto.subtle.digest (WebCrypto API)
     ▼
 hash (60-char bcrypt string)
     │

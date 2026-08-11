@@ -13,21 +13,21 @@ BENAM is a **hybrid-architecture single-page application (SPA)** undergoing an i
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Browser / WebView                   │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │                   index.html                     │   │
-│  │   (PWA shell, 173+ UI sections, CSP meta)        │   │
-│  └────────┬─────────────────────┬───────────────────┘   │
-│           │ loads               │ loads                  │
-│  ┌────────▼──────┐   ┌──────────▼──────────────────┐   │
-│  │  js/ (Legacy) │   │  src/ (TypeScript modules)   │   │
-│  │  app.js       │◄──►  main.ts → legacy-bridge.ts  │   │
-│  │  enhancements │   │  DI Container, EventBus       │   │
-│  │  parts/ (41)  │   │  Domain Services, Facades     │   │
-│  └───────────────┘   └─────────────────────────────┘   │
-│           │                      │                       │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │                   index.html                    │    │
+│  │   (PWA shell, 173+ UI sections, CSP meta)       │    │
+│  └────────┬─────────────────────┬──────────────────┘    │
+│           │ loads               │ loads                 │
+│  ┌────────▼──────┐   ┌──────────▼──────────────────┐    │ 
+│  │  js/ (Legacy) │   │  src/ (TypeScript modules)  │    │
+│  │  app.js       │◄──►  main.ts → legacy-bridge.ts │    │
+│  │  enhancements │   │  DI Container, EventBus     │    │
+│  │  parts/ (41)  │   │  Domain Services, Facades   │    │
+│  └───────────────┘   └─────────────────────────────┘    │
+│           │                      │                      │
 │  ┌────────▼──────────────────────▼───────────────────┐  │
-│  │           window.S  (legacy global state)          │  │
-│  │           localStorage / IndexedDB                 │  │
+│  │           window.S  (legacy global state)         │  │
+│  │           localStorage / IndexedDB                │  │
 │  └───────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```

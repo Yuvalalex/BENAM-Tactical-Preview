@@ -1,13 +1,10 @@
 # BENAM Product Requirements Document
 
 **Product:** BENAM — Battlefield Emergency Network & Aid Manager
+
 **Document status:** Master product and implementation specification
-**Version:** 1.0
-**Date:** 2026-08-12
-**Owner:** Product and Engineering
+
 **Audience:** Product managers, designers, engineers, QA, security reviewers, deployment operators, and autonomous implementation agents
-**Source baseline:** BENAM repository version 1.1.0 on the `main` branch
-**Normative language:** `MUST` is mandatory; `SHOULD` is recommended unless a documented exception exists; `MAY` is optional.
 
 > This document is the single source of truth for BENAM product intent, launch scope, system behavior, quality standards, and delivery decisions. The current implementation is an offline-first PWA with an Android Capacitor package, local persistence, QR-based data exchange, and no backend. Requirements marked **Current** describe verified repository behavior. Requirements marked **Target** describe the intended production contract. An implementation agent MUST preserve current behavior unless a target requirement explicitly changes it.
 
@@ -660,32 +657,32 @@ flowchart LR
 ```text
 +--------------------------- CLIENT / DEVICE TRUST BOUNDARY ---------------------------+
 |                                                                                     |
-|  +------------------+     events/actions      +-------------------------------+    |
-|  | PWA / Android UI  | ↔──────────────────────→| Presentation: Store, Screens,|    |
-|  | RTL, Fire, Night  |                         | Delegator, Feature Facades   |    |
-|  +--------+---------+                         +---------------+---------------+    |
-|           |                                                   |                    |
+|  +------------------+     events/actions      +-------------------------------+     |
+|  | PWA / Android UI  | ↔──────────────────────→| Presentation: Store, Screens,|     |
+|  | RTL, Fire, Night  |                         | Delegator, Feature Facades   |     |
+|  +--------+---------+                         +---------------+---------------+     |
+|           |                                                   |                     |
 |           | Web APIs / Capacitor                              | DI / EventBus       |
-|           ↓                                                   ↓                    |
-|  +------------------+   domain commands   +-----------------------------------+    |
-|  | Camera, Speech,   | ↔────────────────→ | Domain Services                   |    |
-|  | Haptics, Notify   |                    | Casualty, Triage, MARCH, Vitals, |    |
-|  +------------------+                    | Blood, Supply, Evac, Timeline,   |    |
-|                                          | Mesh Sync                         |    |
-|                                          +----------------+------------------+    |
-|                                                           |                       |
-|                                                           | Repository API         |
-|                                                           ↓                       |
+|           ↓                                                   ↓                     |
+|  +------------------+   domain commands   +-----------------------------------+     |
+|  | Camera, Speech,   | ↔────────────────→ | Domain Services                   |     |
+|  | Haptics, Notify   |                    | Casualty, Triage, MARCH, Vitals,  |     |
+|  +------------------+                     | Blood, Supply, Evac, Timeline,    |     |
+|                                           | Mesh Sync                         |     |
+|                                           +----------------+------------------+     |
+|                                                           |                         |
+|                                                           | Repository API          |
+|                                                           ↓                         |
 |  +-------------------+      IndexedDB      +----------------+------------------+    |
-|  | Service Worker /  | ↔────────────────→ | State Repository / Storage Adapter|    |
-|  | Cache API         |                    | schema, validation, fallback     |    |
-|  +-------------------+                    +----------------+------------------+    |
-|                                                           |                       |
-|                                                           ↓                       |
-|                                          +-----------------------------------+    |
-|                                          | Local data: mission, casualties, |    |
-|                                          | timeline, supplies, comms, keys |    |
-|                                          +-----------------------------------+    |
+|  | Service Worker /  | ↔────────────────→ | State Repository / Storage Adapter |    |
+|  | Cache API         |                    | schema, validation, fallback       |    |
+|  +-------------------+                    +----------------+------------------ +    |
+|                                                           |                         |
+|                                                           ↓                         |
+|                                          +-----------------------------------+      |
+|                                          | Local data: mission, casualties,  |      |
+|                                          | timeline, supplies, comms, keys   |      |
+|                                          +-----------------------------------+      |
 +-------------------------------------------------------------------------------------+
               ↕ explicit QR/Binary Burst only; camera scan/display; human confirmation
 +-------------------------------- EXTERNAL BOUNDARY ----------------------------------+
@@ -698,31 +695,38 @@ flowchart LR
 
 ### 5.3.1 Trust-boundary data-flow diagram
 
-```mermaid
-flowchart LR
-  Input["User input / camera / speech<br/>UNTRUSTED"] --> Normalize["Normalize + size limits"]
-  Legacy["Legacy bridge values<br/>UNTRUSTED"] --> Normalize
-  QRIn["QR chunks<br/>UNTRUSTED"] --> Reassemble["Reassemble + FEC"]
-  Reassemble --> Integrity["Checksum + schema validation"]
-  Normalize --> DomainValidation["Domain validation"]
-  Integrity --> DomainValidation
-  DomainValidation -->|accepted| DomainState["Typed domain state<br/>TRUSTED FOR PROCESSING"]
-  DomainValidation -->|rejected| Reject["Reject + explain<br/>no mutation"]
-  DomainState --> Event["EventBus + timeline"]
-  Event --> Projection["AppStore projection"]
-  Projection --> Render["UI / alert / report"]
-  DomainState --> Persist["StateRepository"]
-  Persist --> Local[("IndexedDB / localStorage")]
-  DomainState --> Preview["Import preview"]
-  Preview --> Confirm{"Human confirms?"}
-  Confirm -->|yes| Merge["MeshSyncService.merge"]
-  Confirm -->|no| Cancel["Discard preview"]
-  Merge --> Persist
 
-  classDef untrusted fill:#5a2530,stroke:#e06c75,color:#fff
-  classDef trusted fill:#193b35,stroke:#71c7a6,color:#fff
-  class Input,Legacy,QRIn,Reassemble untrusted
-  class DomainState,Event,Projection,Render trusted
+```mermaid
+sequenceDiagram
+  actor Operator
+  participant UI as User Interface
+  participant Action as ActionDelegator
+  participant Facade as Feature Facade
+  participant Domain as Domain Service
+  participant Bus as EventBus
+  participant Store as AppStore
+  participant Repo as StateRepository
+  participant Storage as Local Storage
+
+  Operator->>UI: Start casualty action
+  UI->>Action: Dispatch action
+  Action->>Facade: Invoke use case
+  Facade->>Domain: Validate and mutate entity
+  Domain->>Bus: Emit domain event
+  Domain->>Repo: Save committed state
+  Repo->>Storage: Write state
+  Storage-->>Repo: Write result
+  Repo-->>Domain: Persistence result
+  Bus-->>Store: Project event
+  Store-->>UI: Render updated view
+  UI-->>Operator: Show result
+
+  opt Persistence failure
+    Storage-->>Repo: Write failure
+    Repo-->>Domain: Failure result
+    Domain-->>UI: Preserve draft
+    UI-->>Operator: Show recovery options
+  end
 ```
 
 - Untrusted input: camera QR frames, imported JSON, speech recognition output, user-entered values, and legacy bridge values.

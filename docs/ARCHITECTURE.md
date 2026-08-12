@@ -51,40 +51,40 @@ The current codebase is a **hybrid architecture**:
 │                         BENAM DEVICE RUNTIME                         │
 │                                                                      │
 │  ┌───────────────────────┐       ┌────────────────────────────────┐  │
-│  │ index.html / PWA shell │       │ Capacitor Android WebView      │  │
+│  │ index.html / PWA shell│       │  Capacitor Android WebView     │  │
 │  │ RTL screens and forms │       │ Camera · Filesystem · Haptics  │  │
 │  └───────────┬───────────┘       └───────────────┬────────────────┘  │
 │              │                                   │                   │
 │              ├───────────────┬───────────────────┘                   │
 │              │               │                                       │
-│  ┌───────────▼───────┐  ┌────▼───────────────────────────────────┐  │
+│  ┌───────────▼───────┐  ┌────▼───────────────────────────────────┐   │
 │  │ Legacy JS runtime │◄►│ TypeScript runtime                      │  │
 │  │ js/app.js         │  │ src/main.ts                             │  │
 │  │ enhancements.js   │  │ DI · EventBus · Domain · Features       │  │
 │  │ parts/01–41       │  │ Presentation · Background               │  │
-│  └───────────┬───────┘  └────────────────────┬────────────────────┘  │
-│              │                              │                       │
-│              └──────────────┬───────────────┘                       │
-│                             ▼                                       │
-│                   ┌──────────────────────┐                          │
-│                   │ window.S / AppStore  │                          │
-│                   │ local state contract │                          │
-│                   └──────────┬───────────┘                          │
-│                              ▼                                      │
-│                   ┌──────────────────────┐                          │
-│                   │ StorageAdapter       │                          │
-│                   │ localStorage today   │                          │
-│                   │ IndexedDB-ready API  │                          │
-│                   └──────────────────────┘                          │
+│  └───────────┬───────┘  └───────────────────┬────────────────────┘   │
+│              │                              │                        │
+│              └──────────────┬───────────────┘                        │
+│                             ▼                                        │
+│                   ┌──────────────────────┐                           │
+│                   │ window.S / AppStore  │                           │
+│                   │ local state contract │                           │
+│                   └──────────┬───────────┘                           │
+│                              ▼                                       │
+│                   ┌──────────────────────┐                           │
+│                   │ StorageAdapter       │                           │
+│                   │ localStorage today   │                           │
+│                   │ IndexedDB-ready API  │                           │
+│                   └──────────────────────┘                           │
 └──────────────────────────────────────────────────────────────────────┘
 
              Explicit physical exchange only
              ┌──────────────┐       ┌──────────────┐
-             │ Device A    │ ─QR─► │ Device B    │
-             │ export      │       │ validate    │
-             └──────────────┘       │ preview     │
-                                    │ confirm     │
-                                    │ merge       │
+             │ Device A     │ ─QR─► │ Device B     │
+             │ export       │       │ validate     │
+             └──────────────┘       │ preview      │
+                                    │ confirm      │
+                                    │ merge        │
                                     └──────────────┘
 ```
 
@@ -1026,21 +1026,21 @@ Retries are appropriate for transient storage or QR acquisition failures, not fo
 
 ```text
 +---------------------- DEVICE SECURITY BOUNDARY -----------------------+
-|                                                                      |
-|  +------------------+       +-------------------------------------+  |
-|  | UI / PIN overlay  | ----> | Local mission data                  |  |
-|  | protected view    |       | names · notes · photos · treatments  |  |
-|  +------------------+       +------------------+------------------+  |
-|                                               │                   |
-|                         +---------------------▼----------------+  |
-|                         | StorageAdapter / backup / export    |  |
-|                         +---------------------+----------------+  |
-|                                               │                   |
-|                          QR / camera boundary │                   |
-+-----------------------------------------------┼-------------------+
+|                                                                       |
+|  +------------------+       +-------------------------------------+   |
+|  | UI / PIN overlay  | ---> | Local mission data                  |   |
+|  | protected view    |      | names · notes · photos · treatments |   |
+|  +------------------+       +------------------+------------------+   |
+|                                               │                       |
+|                         +---------------------▼----------------+      |
+|                         | StorageAdapter / backup / export     |      |
+|                         +---------------------+----------------+      |
+|                                               │                       |
+|                          QR / camera boundary │                       |
++-----------------------------------------------┼-----------------------+
                                                 ▼
                              +-----------------------------------+
-                             | External physical device input   |
+                             | External physical device input    |
                              | untrusted until validated         |
                              +-----------------------------------+
 ```

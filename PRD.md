@@ -684,9 +684,9 @@ flowchart LR
 |                                          | timeline, supplies, comms, keys   |      |
 |                                          +-----------------------------------+      |
 +-------------------------------------------------------------------------------------+
-              ↕ explicit QR/Binary Burst only; camera scan/display; human confirmation
+              explicit QR/Binary Burst only; camera scan/display; human confirmation
 +-------------------------------- EXTERNAL BOUNDARY ----------------------------------+
-| Optional future: signed protocol bundles, approved export destination, MDM.        |
+| Optional future: signed protocol bundles, approved export destination, MDM.         |
 | No external service is required for setup, care, reporting, or local recovery.      |
 +-------------------------------------------------------------------------------------+
 ```
@@ -694,6 +694,58 @@ flowchart LR
 ## 5.3 Data flow and trust boundaries
 
 ### 5.3.1 Trust-boundary data-flow diagram
+
+
+```mermaid
+flowchart LR
+  Input["User input / camera / speech<br/>UNTRUSTED"] --> Normalize["Normalize + size limits"]
+  Legacy["Legacy bridge values<br/>UNTRUSTED"] --> Normalize
+  QRIn["QR chunks<br/>UNTRUSTED"] --> Reassemble["Reassemble + FEC"]
+  Reassemble --> Integrity["Checksum + schema validation"]
+  Normalize --> DomainValidation["Domain validation"]
+  Integrity --> DomainValidation
+  DomainValidation -->|accepted| DomainState["Typed domain state<br/>TRUSTED FOR PROCESSING"]
+  DomainValidation -->|rejected| Reject["Reject + explain<br/>no mutation"]
+  DomainState --> Event["EventBus + timeline"]
+  Event --> Projection["AppStore projection"]
+  Projection --> Render["UI / alert / report"]
+  DomainState --> Persist["StateRepository"]
+  Persist --> Local[("IndexedDB / localStorage")]
+  DomainState --> Preview["Import preview"]
+  Preview --> Confirm{"Human confirms?"}
+  Confirm -->|yes| Merge["MeshSyncService.merge"]
+  Confirm -->|no| Cancel["Discard preview"]
+  Merge --> Persist
+
+  classDef untrusted fill:#5a2530,stroke:#e06c75,color:#fff
+  classDef trusted fill:#193b35,stroke:#71c7a6,color:#fff
+  class Input,Legacy,QRIn,Reassemble untrusted
+  class DomainState,Event,Projection,Render trusted
+```
+
+
+- Untrusted input: camera QR frames, imported JSON, speech recognition output, user-entered values, and legacy bridge values.
+- Trusted after validation: normalized domain entities accepted by schema and business rules.
+- Sensitive boundary: local persistence, screen rendering, export previews, and device backup.
+- Clinical boundary: advisor output and scoring are suggestions; human action is required.
+- Synchronization boundary: imported data is never trusted merely because it came from a known device.
+
+## 5.4 Domain model
+
+Minimum entities:
+
+- **Mission:** role, operation mode, mission type, active/closed status, start/end time, communications, force roster, configuration, protocol version.
+- **Casualty:** stable ID, identity fields, priority T1–T4, injuries, MARCH, vitals, vitals history, treatments, fluids, blood, TQ timestamp, evacuation pipeline, assigned medic, notes, photos, provenance.
+- **TimelineEvent:** event ID, casualty/mission reference, event type, payload summary, event time, device/source, author where available.
+- **SupplyInventory:** item quantities, adjustments, source, time.
+- **MeshPayload:** packet kind, export timestamp, scope, casualties, timeline, supplies, schema version, checksum, chunk metadata.
+- **AdvisorSignal:** deterministic rule ID, severity, casualty reference, reason, created time, acknowledgement state, protocol version.
+
+The implementation MUST maintain one canonical serialization format per schema version. Unknown fields MUST be preserved where feasible or rejected with a clear migration result; silent dropping is prohibited for clinical fields.
+
+## 5.5 API and integration contracts
+
+### 5.5.1 Internal service interaction diagram
 
 
 ```mermaid
@@ -726,63 +778,6 @@ sequenceDiagram
     Repo-->>Domain: Failure result
     Domain-->>UI: Preserve draft
     UI-->>Operator: Show recovery options
-  end
-```
-
-- Untrusted input: camera QR frames, imported JSON, speech recognition output, user-entered values, and legacy bridge values.
-- Trusted after validation: normalized domain entities accepted by schema and business rules.
-- Sensitive boundary: local persistence, screen rendering, export previews, and device backup.
-- Clinical boundary: advisor output and scoring are suggestions; human action is required.
-- Synchronization boundary: imported data is never trusted merely because it came from a known device.
-
-## 5.4 Domain model
-
-Minimum entities:
-
-- **Mission:** role, operation mode, mission type, active/closed status, start/end time, communications, force roster, configuration, protocol version.
-- **Casualty:** stable ID, identity fields, priority T1–T4, injuries, MARCH, vitals, vitals history, treatments, fluids, blood, TQ timestamp, evacuation pipeline, assigned medic, notes, photos, provenance.
-- **TimelineEvent:** event ID, casualty/mission reference, event type, payload summary, event time, device/source, author where available.
-- **SupplyInventory:** item quantities, adjustments, source, time.
-- **MeshPayload:** packet kind, export timestamp, scope, casualties, timeline, supplies, schema version, checksum, chunk metadata.
-- **AdvisorSignal:** deterministic rule ID, severity, casualty reference, reason, created time, acknowledgement state, protocol version.
-
-The implementation MUST maintain one canonical serialization format per schema version. Unknown fields MUST be preserved where feasible or rejected with a clear migration result; silent dropping is prohibited for clinical fields.
-
-## 5.5 API and integration contracts
-
-### 5.5.1 Internal service interaction diagram
-
-```mermaid
-sequenceDiagram
-  autonumber
-  actor Operator
-  participant UI as UI / ScreenManager
-  participant Action as ActionDelegator
-  participant Facade as Feature Facade
-  participant Domain as Domain Service
-  participant Bus as EventBus
-  participant Store as AppStore
-  participant Repo as StateRepository
-  participant Storage as IndexedDB / localStorage
-
-  Operator->>UI: Tap Quick Add / edit casualty
-  UI->>Action: Dispatch named action
-  Action->>Facade: Invoke typed use-case facade
-  Facade->>Domain: Validate and mutate domain entity
-  Domain->>Bus: Emit domain event
-  Domain->>Repo: Save committed state
-  Repo->>Storage: set(state)
-  Storage-->>Repo: Result<void>
-  Repo-->>Domain: Persistence result
-  Bus-->>Store: Project event into app state
-  Store-->>UI: Render updated view
-  UI-->>Operator: Show committed state / error
-
-  alt Persistence failure
-    Storage-->>Repo: Err(STORAGE_* )
-    Repo-->>Domain: Failure result
-    Domain-->>UI: Do not claim save; preserve draft
-    UI-->>Operator: Recovery / export / retry state
   end
 ```
 

@@ -17,7 +17,7 @@
 
 <br>
 
-## 📢 [Click here to view the full BENAM Presentation Deck!](https://docs.google.com/presentation/d/1dOmADFgqdxe--yQ07pob6icAYKNHVX6_DnLUm9n2ZiU/edit?usp=sharing) 📽️
+## 📢 [Click here to view the full BENAM Presentation Deck!](https://docs.google.com/presentation/d/1twVApyMbVtrZkZTEZLtRYB0qVQhJakoJpsLvrPPScf4/edit?usp=sharing) 📽️
 
 </div>
 

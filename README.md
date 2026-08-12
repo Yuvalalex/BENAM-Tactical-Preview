@@ -155,7 +155,7 @@ Notes:
 | **Debrief / Stats** | `sc-stats` | Statistics, Gantt chart, Hero Score |
 | **Timeline** | `sc-timeline` | Full chronological incident log |
 
-### Product Screenshots
+### 📱 Product Screenshots 📱
 
 The gallery follows the operator's journey through BENAM. Select a workflow below to open a focused set of screens, read what the workflow is for, and open any image at full resolution. GitHub READMEs do not support JavaScript tabs, so native `<details>` panels provide an accessible, dependency-free alternative.
 

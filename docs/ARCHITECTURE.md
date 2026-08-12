@@ -58,10 +58,10 @@ The current codebase is a **hybrid architecture**:
 │              ├───────────────┬───────────────────┘                   │
 │              │               │                                       │
 │  ┌───────────▼───────┐  ┌────▼───────────────────────────────────┐   │
-│  │ Legacy JS runtime │◄►│ TypeScript runtime                      │  │
-│  │ js/app.js         │  │ src/main.ts                             │  │
-│  │ enhancements.js   │  │ DI · EventBus · Domain · Features       │  │
-│  │ parts/01–41       │  │ Presentation · Background               │  │
+│  │ Legacy JS runtime │◄►│ TypeScript runtime                     │   │
+│  │ js/app.js         │  │ src/main.ts                            │   │
+│  │ enhancements.js   │  │ DI · EventBus · Domain · Features      │   │
+│  │ parts/01–41       │  │ Presentation · Background              │   │
 │  └───────────┬───────┘  └───────────────────┬────────────────────┘   │
 │              │                              │                        │
 │              └──────────────┬───────────────┘                        │

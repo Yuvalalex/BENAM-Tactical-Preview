@@ -59,6 +59,8 @@ BENAM is a tactical medical management system (PWA) built for combat medical tea
 **Project Structure**  
 Hybrid architecture — Legacy JS layer (~23,500 lines) alongside a modern TypeScript layer (~5,300 lines) with Dependency Injection, Domain Services, and Background Tasks.
 
+[`ARCHITECTURE.md`](..docs/ARCHITECTURE.md )
+
 ```text
 BENAM---Tactical-Preview/
 ├── index.html            # Full SPA 

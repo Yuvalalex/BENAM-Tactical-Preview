@@ -1439,6 +1439,14 @@ function showPinLock(){
   }
 }
 
+function togglePinLock(force){
+  const el=document.getElementById('pin-lock');
+  if(!el) return;
+  const shouldShow=typeof force==='boolean' ? force : el.style.display==='none';
+  if(shouldShow) showPinLock();
+  else pinUnlock();
+}
+
 // Show PIN lock on startup if PIN exists
 (function initPinLock(){
   const stored=localStorage.getItem('benam_pin');
@@ -2021,6 +2029,10 @@ function updateEvacOrder(){
   renderEvacWarSnapshot();
 }
 
+function renderEvacOrder(){
+  updateEvacOrder();
+}
+
 function saveEvacForce(){
   S.evacForce={
     driver:($('evac-driver')?.value||'').trim(),
@@ -2102,7 +2114,7 @@ function updateReadiness(){
     else if (c.label.includes('LZ')) targetId = 'p-lz1';
     else if (c.label.includes('לוחמים') || c.label.includes('ברזל') || c.label.includes('דם') || c.label.includes('רפואה')) targetId = 'sc-prep'; // Scroll to force roster area
 
-    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${bg};border-right:3px solid ${bdr};border-radius:0 4px 4px 0;margin-bottom:4px">
+    return `<div class="check-item" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${bg};border-right:3px solid ${bdr};border-radius:0 4px 4px 0;margin-bottom:4px">
       <div style="width:20px;text-align:center">${ic}</div>
       <div style="flex:1">
         <div style="font-size:12px;font-weight:700;color:var(--white)">${c.icon} ${c.label}</div>
@@ -2159,6 +2171,7 @@ function openEquipDetail(itemKey) {
 if (typeof window !== 'undefined') {
   window.openEquipDetail = openEquipDetail;
   window.updateReadiness = updateReadiness;
+  window.renderEvacOrder = renderEvacOrder;
   window.updateEvacOrder = updateEvacOrder;
   window.updateEquipSummary = updateEquipSummary;
 }

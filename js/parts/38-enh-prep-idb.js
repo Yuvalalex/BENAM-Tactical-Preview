@@ -180,6 +180,14 @@ function showPinLock(){
   }
 }
 
+function togglePinLock(force){
+  const el=document.getElementById('pin-lock');
+  if(!el) return;
+  const shouldShow=typeof force==='boolean' ? force : el.style.display==='none';
+  if(shouldShow) showPinLock();
+  else pinUnlock();
+}
+
 // Show PIN lock on startup if PIN exists
 (function initPinLock(){
   const stored=localStorage.getItem('benam_pin');

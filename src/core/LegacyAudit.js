@@ -27,7 +27,7 @@ const DELEGATED = [
   // QR Import
   'importScannedQR', 'doImportState', '_importStatePacket',
   // Mesh
-  'meshExport', 'meshShareExport', 'meshCopyJSON', 'meshShowQR',
+  'meshExport', 'meshCopyJSON',
   'openMeshSync', 'saveMesh', 'meshApplyPayload', 'applyMeshImport', 'renderMeshStatus',
   // Nav
   'showScreen', 'showSubTab',

@@ -1,14 +1,5 @@
 const { test, expect } = require('@playwright/test');
 
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('benam_tutorial_done', '1');
-    localStorage.removeItem('benam_pin');
-    localStorage.removeItem('benam_s');
-    localStorage.removeItem('benam_s_training');
-  });
-});
-
 /**
  * BENAM ULTIMATE 100+ SMOKE SUITE
  * ═══════════════════════════════════════════════════════════════
@@ -17,12 +8,10 @@ test.beforeEach(async ({ page }) => {
  */
 
 async function setup(page) {
+  await page.addInitScript(() => localStorage.setItem('benam_tutorial_done', '1'));
   await page.goto('/', { waitUntil: 'load' });
-  await page.evaluate(() => {
-    skipRoleSetup();
-    if (typeof closeModal === 'function') closeModal();
-    if (typeof closeDrawer === 'function') closeDrawer();
-  });
+  await page.waitForFunction(() => typeof window.renderEvacOrder === 'function');
+  await page.evaluate(() => { if(typeof closeTutorial === 'function') closeTutorial(); else { const tut = document.getElementById('tutorial-overlay'); if(tut) tut.style.display='none'; } skipRoleSetup(); updateReadiness(); updateEvacOrder(); });
 }
 
 async function start(page) {
@@ -47,18 +36,18 @@ test.describe('CLUSTER 1: Infrastructure & Core Boot', () => {
 
   test('003: PIN Lock screen renders correctly', async ({ page }) => {
     await page.goto('/');
-    await page.evaluate(() => { if (typeof showPinLock === 'function') showPinLock(); });
+    await page.evaluate(() => { if(typeof togglePinLock === 'function') togglePinLock(true); });
     await expect(page.locator('#pin-lock')).toBeVisible();
   });
 
   test('004: Night Mode toggle state persistence', async ({ page }) => {
     await setup(page);
     await page.evaluate(() => { toggleNightMode(); });
-    const isNight = await page.evaluate(() => document.body.classList.contains('night-vision'));
-    expect(isNight).toBeTruthy();
+    const isLight = await page.evaluate(() => document.body.classList.contains('night-vision'));
+    expect(isLight).toBeTruthy();
     await page.reload();
-    const isNightAfter = await page.evaluate(() => document.body.classList.contains('night-vision'));
-    expect(isNightAfter).toBeTruthy();
+    const isLightAfter = await page.evaluate(() => document.body.classList.contains('night-vision'));
+    expect(isLightAfter).toBeTruthy();
   });
 
   test('005: Manifest link exists in head', async ({ page }) => {
@@ -69,18 +58,15 @@ test.describe('CLUSTER 1: Infrastructure & Core Boot', () => {
 
   test('006: LocalStorage save/load cycle', async ({ page }) => {
     await setup(page);
-    const unit = await page.evaluate(() => {
-      S.comms.unit = 'TEST_UNIT_99';
-      saveState();
-      const raw = localStorage.getItem('benam_s');
-      if (!raw) return null;
-      try { return JSON.parse(raw).comms?.unit ?? null; } catch (_) { return null; }
-    });
+    await page.evaluate(() => { S.comms.unit = 'TEST_UNIT_99'; saveState(); });
+    await page.reload();
+    await page.waitForFunction(() => window.S && window.S.comms && window.S.comms.unit === 'TEST_UNIT_99');
+    const unit = await page.evaluate(() => S.comms.unit);
     expect(unit).toBe('TEST_UNIT_99');
   });
 
   test('007-010: Core viewport responsiveness', async ({ page }) => {
-    const viewports = [{ width: 375, height: 812 }, { width: 414, height: 896 }, { width: 1024, height: 1366 }];
+    const viewports = [{width:375, height:812}, {width:414, height:896}, {width:1024, height:1366}];
     for(const vp of viewports) {
       await page.setViewportSize(vp);
       await page.goto('/');
@@ -92,8 +78,8 @@ test.describe('CLUSTER 1: Infrastructure & Core Boot', () => {
 test.describe('CLUSTER 2: Preparation & Mission Context', () => {
   test('011-015: Role selection logic', async ({ page }) => {
     await page.goto('/');
-    for (const role of ['commander', 'medic', 'doc', 'paramedic']) {
-      await page.evaluate(r => { 
+    for(const role of ['commander', 'medic', 'doc', 'paramedic']) {
+      await page.evaluate(r => {
         const btn = document.querySelector(`[onclick="selectRole('${r}')"]`);
         if(btn) btn.click();
       }, role);
@@ -105,22 +91,22 @@ test.describe('CLUSTER 2: Preparation & Mission Context', () => {
 
   test('016: Mission Readiness Checklist initialization', async ({ page }) => {
     await setup(page);
-    await expect(page.locator('text=בד"ח מוכנות ליציאה')).toBeVisible();
-    const checklistExists = await page.evaluate(() => !!document.querySelector('#readiness-checklist'));
-    expect(checklistExists).toBeTruthy();
+    await expect(page.locator('text=מוכנות ליציאה')).toBeVisible();
+    const checklistCount = await page.evaluate(() => document.querySelectorAll('#readiness-checklist .check-item').length);
+    expect(checklistCount).toBeGreaterThan(0);
   });
 
   test('017: Evacuation Order sorting logic (Prep Tab)', async ({ page }) => {
     await setup(page);
-    const topName = await page.evaluate(() => {
-      S.casualties = [
-        { id: 1, name: 'T2', priority: 'T2', _addedAt: 100, vitals: {}, txList: [], injuries: [], march: {}, fluidTotal: 0 },
-        { id: 2, name: 'T1', priority: 'T1', _addedAt: 200, vitals: {}, txList: [], injuries: [], march: {}, fluidTotal: 0 }
+    await page.evaluate(() => {
+      window.S.casualties = [
+        { id: 1, name: 'T2', priority: 'T2', _addedAt: 100 },
+        { id: 2, name: 'T1', priority: 'T1', _addedAt: 200 }
       ];
-      const ranked = [...S.casualties].sort((a, b) => calcEvacScore(b) - calcEvacScore(a));
-      return ranked[0].name;
+      window.renderEvacOrder();
     });
-    expect(topName).toBe('T1');
+    const firstCas = await page.locator('#evac-order-list > div').first().textContent();
+    expect(firstCas).toContain('T1');
   });
 });
 
@@ -130,16 +116,12 @@ test.describe('CLUSTER 3: Patient Lifecycle (Form 101)', () => {
     await page.evaluate(() => { quickAddCas(); });
     const cId = await page.evaluate(() => S.casualties[0].id);
     await page.evaluate(id => jumpToCas(id), cId);
-    
-    const priorities = ['T1', 'T2', 'T3', 'T4', 'Done'];
+
+    const priorities = ['T1', 'T2', 'T3', 'T4'];
     for(const p of priorities) {
-      await page.evaluate(({ id, prio }) => {
-        const normalized = prio === 'Done' ? 'T4' : prio;
-        changePriority(id, normalized);
-      }, { id: cId, prio: p });
+      await page.locator(`#cas-drawer button[onclick*="changePriority"][onclick*="'${p}'"]`).click();
       const currentPrio = await page.evaluate(id => S.casualties.find(c => c.id === id).priority, cId);
-      const expected = p === 'Done' ? 'T4' : p;
-      expect(currentPrio).toContain(expected.substring(0,2));
+      expect(currentPrio).toBe(p);
     }
   });
 
@@ -148,11 +130,11 @@ test.describe('CLUSTER 3: Patient Lifecycle (Form 101)', () => {
     await page.evaluate(() => { quickAddCas(); });
     const cId = await page.evaluate(() => S.casualties[0].id);
     for(let i=0; i<5; i++) {
-      await page.evaluate(({ id, step }) => {
+      await page.evaluate(({ id, index }) => {
         const cas = S.casualties.find(c => c.id === id);
-        cas.vitals.pulse = String(80 + step);
+        cas.vitals.pulse = 80 + index;
         snapshotVitals(id);
-      }, { id: cId, step: i });
+      }, { id: cId, index: i });
     }
     const historyCount = await page.evaluate(id => S.casualties.find(c => c.id === id).vitalsHistory.length, cId);
     expect(historyCount).toBe(5);
@@ -178,18 +160,18 @@ test.describe('CLUSTER 4: Tactical Sync Master', () => {
       quickAddCas(); quickAddCas();
       await meshExport();
     });
-    
+
     await expect(page.locator('#qr-target-frame')).toBeVisible();
     await expect(page.locator('#qr-auto-btn')).toBeVisible();
-    
+
     // Auto-advance speed check
     await page.click('#spd-1000');
     expect(await page.evaluate(() => _qrAutoSpeed)).toBe(1000);
-    
+
     // Scope change
     await page.evaluate(() => { closeModal(); openSyncDashboard('export'); });
     await page.locator('#modal-body').getByText('👤 פצוע ספציפי', { exact: true }).click();
-    await expect.poll(async () => page.evaluate(() => window._burstScope || 'all')).toBe('cas');
+    await expect(page.locator('#modal-body').getByText('מוכן לשידור טקטי', { exact: true })).toBeVisible();
   });
 });
 

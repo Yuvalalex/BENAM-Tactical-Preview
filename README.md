@@ -28,6 +28,8 @@
 **What is BENAM?**  
 BENAM is a tactical medical management system (PWA) built for combat medical teams. It accompanies the team from pre-mission preparation, through active combat incident management in real time, to a final summary report and debrief — with **zero dependency on internet, servers, or any external infrastructure.**
 
+- [Product Requirements Document](PRD.md)
+
 ## User Workflow
 
 1. **Mode & Role Setup** 

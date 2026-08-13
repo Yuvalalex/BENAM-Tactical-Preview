@@ -23,10 +23,10 @@
 
 ---
 
-## Overview
+## Overview - [`PRD.md`](PRD.md)
 
 **What is BENAM?**  
-BENAM is a tactical medical management system (PWA) built for combat medical teams. It accompanies the team from pre-mission preparation, through active combat incident management in real time, to a final summary report and debrief — with **zero dependency on internet, servers, or any external infrastructure** - [`PRD.md`](PRD.md)
+BENAM is a tactical medical management system (PWA) built for combat medical teams. It accompanies the team from pre-mission preparation, through active combat incident management in real time, to a final summary report and debrief — with **zero dependency on internet, servers, or any external infrastructure** 
 
 ## User Workflow
 
@@ -54,10 +54,10 @@ BENAM is a tactical medical management system (PWA) built for combat medical tea
 
 ---
 
-## Architecture
+## Architecture - [`ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 **Project Structure**  
-Hybrid architecture — Legacy JS layer (~23,500 lines) alongside a modern TypeScript layer (~5,300 lines) with Dependency Injection, Domain Services, and Background Tasks - [`ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+Hybrid architecture — Legacy JS layer (~23,500 lines) alongside a modern TypeScript layer (~5,300 lines) with Dependency Injection, Domain Services, and Background Tasks 
 
 ```text
 BENAM---Tactical-Preview/

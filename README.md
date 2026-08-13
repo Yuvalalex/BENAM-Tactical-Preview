@@ -1,7 +1,15 @@
 <div align="center">
 
 # BENAM - Battlefield Emergency Network & Aid Manager
-**// Tactical Medical Incident Management - 100% Offline**
+**Tactical Medical Incident Management - 100% Offline**
+---
+
+**🔒 Security, Architecture & Feature Coverage 🔒**
+
+**This repository provides a comprehensive and fully featured showcase, containing all the essential components required to demonstrate and evaluate the system's core capabilities. To protect proprietary intellectual property and maintain operational security, select code files and sensitive architecture elements have been adjusted or omitted. Full technical documentation, algorithmic logic, internal data structures, full system schematics, dependency mappings, communication protocols, and cryptographic mechanisms remain strictly confidential.**
+
+---
+
 
 ![offline 100%](https://img.shields.io/badge/offline-100%25-success)
 ![PWA ready](https://img.shields.io/badge/PWA-ready-success)

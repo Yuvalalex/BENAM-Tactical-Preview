@@ -205,12 +205,12 @@ This is the clinical point-of-care surface: injury mapping, T1–T4 triage, MARC
   </tr>
   <tr>
     <td align="center"><a href="docs/screenshots/screenshot-08.png"><img src="docs/screenshots/screenshot-08.png" width="220" alt="Casualty treatment details"></a><br><sub>Treatment record</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-09.png"><img src="docs/screenshots/screenshot-09.png" width="220" alt="Medication and dosage support"></a><br><sub>Medication support</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-09.png"><img src="docs/screenshots/screenshot-09.png" width="220" alt="Medication and dosage support"></a><br><sub>War Room casualty</sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-10.png"><img src="docs/screenshots/screenshot-10.png" width="220" alt="Triage priority view"></a><br><sub>Triage priorities</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-11.png"><img src="docs/screenshots/screenshot-11.png" width="220" alt="Blood compatibility view"></a><br><sub>Blood compatibility</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-12.png"><img src="docs/screenshots/screenshot-12.png" width="220" alt="Clinical checklist"></a><br><sub>Clinical checklist</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-11.png"><img src="docs/screenshots/screenshot-11.png" width="220" alt="Blood compatibility view"></a><br><sub>Triage compatibility</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-12.png"><img src="docs/screenshots/screenshot-12.png" width="220" alt="Clinical checklist"></a><br><sub>Clinical Drag & Drop</sub></td>
     <td></td>
   </tr>
 </table>
@@ -223,18 +223,18 @@ This layer turns individual care records into a coordinated operational picture.
 
 <table>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-13.png"><img src="docs/screenshots/screenshot-13.png" width="220" alt="Operational checklist"></a><br><sub>Operational checklist</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-13.png"><img src="docs/screenshots/screenshot-13.png" width="220" alt="Operational checklist"></a><br><sub>Triage Tag Operational Card</sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-14.png"><img src="docs/screenshots/screenshot-14.png" width="220" alt="Radio script and communications view"></a><br><sub>Radio and communications</sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-15.png"><img src="docs/screenshots/screenshot-15.png" width="220" alt="Reference library"></a><br><sub>Reference library</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-16.png"><img src="docs/screenshots/screenshot-16.png" width="220" alt="Field treatment action screen"></a><br><sub>Next action surface</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-16.png"><img src="docs/screenshots/screenshot-16.png" width="220" alt="Field treatment action screen"></a><br><sub>QR surface</sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-17.png"><img src="docs/screenshots/screenshot-17.png" width="220" alt="Evacuation queue"></a><br><sub>Evacuation queue</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-18.png"><img src="docs/screenshots/screenshot-18.png" width="220" alt="Evacuation priority view"></a><br><sub>Priority ordering</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-18.png"><img src="docs/screenshots/screenshot-18.png" width="220" alt="Evacuation priority view"></a><br><sub>Smart Priority TODO List</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-19.png"><img src="docs/screenshots/screenshot-19.png" width="220" alt="Medic allocation and advisor view"></a><br><sub>Medic allocation</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-20.png"><img src="docs/screenshots/screenshot-20.png" width="220" alt="CASEVAC management view"></a><br><sub>CASEVAC management</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-19.png"><img src="docs/screenshots/screenshot-19.png" width="220" alt="Medic allocation and advisor view"></a><br><sub>Medic Priority allocation</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-20.png"><img src="docs/screenshots/screenshot-20.png" width="220" alt="CASEVAC management view"></a><br><sub>FIRE MODE - management</sub></td>
     <td></td>
   </tr>
 </table>
@@ -247,12 +247,12 @@ BENAM can exchange a complete scene or a selected casualty through a human-contr
 
 <table>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-21.png"><img src="docs/screenshots/screenshot-21.png" width="220" alt="Blood bank compatibility matrix"></a><br><sub>Blood and handoff context</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-22.png"><img src="docs/screenshots/screenshot-22.png" width="220" alt="Sync Master dashboard"></a><br><sub>Sync Master dashboard</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-23.png"><img src="docs/screenshots/screenshot-23.png" width="220" alt="Binary Burst QR transmission"></a><br><sub>Binary Burst transmission</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-21.png"><img src="docs/screenshots/screenshot-21.png" width="220" alt="Blood bank compatibility matrix"></a><br><sub></sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-22.png"><img src="docs/screenshots/screenshot-22.png" width="220" alt="Sync Master dashboard"></a><br><sub>Master dashboard</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-23.png"><img src="docs/screenshots/screenshot-23.png" width="220" alt="Binary Burst QR transmission"></a><br><sub>Blood and handoff context</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-24.png"><img src="docs/screenshots/screenshot-24.png" width="220" alt="Scoped casualty synchronization"></a><br><sub>Scoped patient handoff</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-24.png"><img src="docs/screenshots/screenshot-24.png" width="220" alt="Scoped casualty synchronization"></a><br><sub>Tools</sub></td>
     <td></td>
     <td></td>
   </tr>
@@ -266,18 +266,18 @@ The final workflow converts field activity into a traceable record. It includes 
 
 <table>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-25.png"><img src="docs/screenshots/screenshot-25.png" width="220" alt="Incident report overview"></a><br><sub>Incident report</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-25.png"><img src="docs/screenshots/screenshot-25.png" width="220" alt="Incident report overview"></a><br><sub>Medical resources</sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-26.png"><img src="docs/screenshots/screenshot-26.png" width="220" alt="Timeline and event history"></a><br><sub>Timeline and events</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-27.png"><img src="docs/screenshots/screenshot-27.png" width="220" alt="Training mode scenarios"></a><br><sub>Training scenarios</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-27.png"><img src="docs/screenshots/screenshot-27.png" width="220" alt="Training mode scenarios"></a><br><sub></sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-28.png"><img src="docs/screenshots/screenshot-28.png" width="220" alt="After action review interface"></a><br><sub>After-action review</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-28.png"><img src="docs/screenshots/screenshot-28.png" width="220" alt="After action review interface"></a><br><sub></sub></td>
     <td align="center"><a href="docs/screenshots/screenshot-29.png"><img src="docs/screenshots/screenshot-29.png" width="220" alt="Clinical reference content"></a><br><sub>Clinical references</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-30.png"><img src="docs/screenshots/screenshot-30.png" width="220" alt="Medical resources view"></a><br><sub>Medical resources</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-30.png"><img src="docs/screenshots/screenshot-30.png" width="220" alt="Medical resources view"></a><br><sub>Timeline and events</sub></td>
   </tr>
   <tr>
-    <td align="center"><a href="docs/screenshots/screenshot-31.png"><img src="docs/screenshots/screenshot-31.png" width="220" alt="Digital triage tag output"></a><br><sub>Digital triage tag</sub></td>
-    <td align="center"><a href="docs/screenshots/screenshot-32.png"><img src="docs/screenshots/screenshot-32.png" width="220" alt="Training and analytics view"></a><br><sub>Training and analytics</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-31.png"><img src="docs/screenshots/screenshot-31.png" width="220" alt="Digital triage tag output"></a><br><sub>Incident report</sub></td>
+    <td align="center"><a href="docs/screenshots/screenshot-32.png"><img src="docs/screenshots/screenshot-32.png" width="220" alt="Training and analytics view"></a><br><sub>Training</sub></td>
     <td></td>
   </tr>
 </table>
